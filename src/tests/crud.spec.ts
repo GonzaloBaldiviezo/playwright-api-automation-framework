@@ -48,3 +48,35 @@ test.describe('CRUD API - Positive', () => {
     expect(response.status()).toBe(204);
   });
 });
+
+test.describe('CRUD API - Negative', () => {
+  test('POST /users with null payload returns 400 and error message', async ({ apiClient }) => {
+    const response = await apiClient.post('users', null);
+
+    expect(response.status()).toBe(400);
+
+    const body = await response.json();
+
+    expect(body.error).toBeDefined();
+  });
+
+  test('PUT /users/:id with null payload returns 400 and error message', async ({ apiClient }) => {
+    const response = await apiClient.put('users/2', null);
+
+    expect(response.status()).toBe(400);
+
+    const body = await response.json();
+
+    expect(body.error).toBeDefined();
+  });
+
+  test('PATCH /users/:id with null payload returns 400 and error message', async ({ apiClient }) => {
+    const response = await apiClient.patch('users/2', null);
+
+    expect(response.status()).toBe(400);
+
+    const body = await response.json();
+
+    expect(body.error).toBeDefined();
+  });
+});

@@ -32,4 +32,15 @@ test.describe('Resources API - Negative', () => {
 
     expect(response.status()).toBe(404);
   });
+
+  test('GET /resources with malformed per_page query returns 200 (runtime behavior)', async ({ apiClient }) => {
+    const response = await apiClient.get('resources?per_page=-1');
+
+    expect(response.status()).toBe(200);
+
+    const body = await response.json();
+
+    expect(body.per_page).toBe(-1);
+    expect(Array.isArray(body.data)).toBe(true);
+  });
 });

@@ -48,4 +48,15 @@ test.describe('Users API - Negative', () => {
 
     expect(body).toBeDefined();
   });
+
+  test('GET /users with malformed per_page query returns 200 (runtime behavior)', async ({ apiClient }) => {
+    const response = await apiClient.get('users?per_page=101');
+
+    expect(response.status()).toBe(200);
+
+    const body = await response.json();
+
+    expect(body.per_page).toBe(101);
+    expect(Array.isArray(body.data)).toBe(true);
+  });
 });
