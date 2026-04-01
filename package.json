@@ -1,0 +1,33 @@
+{
+  "name": "playwright-api-automation-framework",
+  "version": "1.0.0",
+  "description": "API test automation framework built with Playwright and TypeScript for portfolio-ready backend testing.",
+  "scripts": {
+    "test": "playwright test",
+    "report": "playwright show-report"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GonzaloBaldiviezo/playwright-api-automation-framework.git"
+  },
+  "keywords": [
+    "playwright",
+    "api-testing",
+    "typescript",
+    "test-automation",
+    "portfolio"
+  ],
+  "author": "Gonzalo Baldiviezo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GonzaloBaldiviezo/playwright-api-automation-framework/issues"
+  },
+  "homepage": "https://github.com/GonzaloBaldiviezo/playwright-api-automation-framework#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@types/node": "^25.5.0"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1"
+  }
+}
