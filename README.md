@@ -7,6 +7,7 @@ This repository demonstrates solid engineering practices: reusable abstractions,
 ## What this repository includes
 
 - **Reusable `ApiClient`** — One abstraction for all HTTP operations (GET, POST, PUT, PATCH, DELETE). Centralized auth, zero repetition.
+- **Lightweight response helper** — A minimal shared helper for status + JSON extraction (`expectJsonResponse`) to avoid repetitive boilerplate.
 - **Fail-fast env validation** — Missing `BASE_URL` or `API_KEY`? You find out immediately, not mid-test.
 - **Shared Playwright fixtures** — Inject `apiClient` into every test; zero boilerplate setup per spec.
 - **Fast CI/CD** — Single Playwright project (`api`), optimized for backend validation without unnecessary overhead.
@@ -22,10 +23,16 @@ This repository demonstrates solid engineering practices: reusable abstractions,
 ## Test strategy
 
 - **smoke** — Core happy paths. Does the API respond to key requests? The essentials.
+- **positive** — Valid requests and expected success flows.
 - **negative** — Edge cases and errors. Invalid input → 400. Missing resource → 404. Framework handles them.
-- **contract** — Beyond status codes. Verify response shape and critical fields match expectations.
 
 The foundation is here; the framework is structured to grow from an initial smoke suite into full coverage.
+
+## Test organization
+
+- Positive and negative scenarios are separated into different `describe` blocks in each spec.
+- Tests are tagged with `@smoke`, `@positive`, and `@negative` so the suite can be filtered without changing files.
+- Assertions stay mostly inline in specs, with a single shared response helper to keep the suite simple and explicit.
 
 ## Project structure
 
@@ -35,8 +42,15 @@ src/
     client.ts         ← HTTP abstraction layer
   fixtures/
     api.fixture.ts    ← Playwright fixture for apiClient injection
+  utils/
+    api-assertions.ts ← Shared response helper (`expectJsonResponse`)
   tests/
-    users.spec.ts     ← Example: smoke test for users endpoint
+    users.spec.ts     ← Users coverage grouped by positive/negative
+    resources.spec.ts ← Resources coverage grouped by positive/negative
+    auth.spec.ts      ← Auth coverage grouped by positive/negative
+    crud.spec.ts      ← Write operations grouped by positive/negative
+docs/
+  reqres-coverage-matrix.md ← OpenAPI/runtime coverage tracking
 
 env.ts                ← Environment & URL helpers (shared across config & client)
 playwright.config.ts  ← Single API project, fast execution
@@ -64,6 +78,9 @@ Or copy from `.env.example`.
 
 ```bash
 npm test
+npm run test:smoke
+npm run test:positive
+npm run test:negative
 ```
 
 4. **Report**
@@ -93,14 +110,22 @@ Reqres is a hosted REST API for testing — perfect for portfolio work.
 **Run tests:**
 ```bash
 npm test  # Runs against Reqres live endpoints
+npm run test:smoke  # Core health-check flow
+npm run test:positive  # Successful scenarios only
+npm run test:negative  # Error and edge-case scenarios only
 npm run report  # View results in HTML
 ```
 
 This setup demonstrates real-world auth patterns: the framework always sends credentials (as shown in [src/api/client.ts](src/api/client.ts)), keeping authentication concerns centralized and separated from test logic.
 
+## CI/CD
+
+GitHub Actions runs the Playwright suite on every push (all branches), on pull requests to `main` and `master`, and manually via workflow dispatch using [.github/workflows/playwright.yml](.github/workflows/playwright.yml). The workflow installs dependencies with `npm ci`, runs the suite, and uploads the Playwright HTML report as an artifact.
+
 ## Implementation highlights
 
 - **ApiClient** — Thin wrapper around Playwright's `request` context. Handles headers, path normalization, and method abstraction. ~60 lines, zero magic.
+- **Response helper** — [src/utils/api-assertions.ts](src/utils/api-assertions.ts) centralizes status + JSON parsing while keeping business assertions inside each test.
 - **Fixture injection** — Playwright's `test.extend()` pattern. Injects `apiClient` into every test. Clean, type-safe, extensible.
 - **Environment validation** — `getRequiredEnv()` throws early if `BASE_URL` or `API_KEY` are missing. No silent failures.
 - **Configuration** — Single app-level config with `normalizeBaseUrl()` to avoid trailing-slash gotchas.
