@@ -1,15 +1,13 @@
 import { test, expect } from '../fixtures/api.fixture';
+import { expectJsonResponse } from '../utils/api-assertions';
 
-test.describe('Auth API - Positive', () => {
-  test('POST /login with valid credentials returns 200 and token', async ({ apiClient }) => {
+test.describe('Auth API - Positive @positive', () => {
+  test('@smoke POST /login with valid credentials returns 200 and token', async ({ apiClient }) => {
     const response = await apiClient.post('login', {
       email: 'eve.holt@reqres.in',
       password: 'cityslicka',
     });
-
-    expect(response.status()).toBe(200);
-
-    const body = await response.json();
+    const body = await expectJsonResponse(response, 200);
 
     expect(body.token).toBeDefined();
     expect(typeof body.token).toBe('string');
@@ -20,68 +18,55 @@ test.describe('Auth API - Positive', () => {
       email: 'eve.holt@reqres.in',
       password: 'cityslicka',
     });
-
-    expect(response.status()).toBe(200);
-
-    const body = await response.json();
+    const body = await expectJsonResponse(response, 200);
 
     expect(body.id).toBeDefined();
     expect(body.token).toBeDefined();
   });
 });
 
-test.describe('Auth API - Negative', () => {
+test.describe('Auth API - Negative @negative', () => {
   test('POST /login without password returns 400 and error message', async ({ apiClient }) => {
     const response = await apiClient.post('login', {
       email: 'eve.holt@reqres.in',
     });
-
-    expect(response.status()).toBe(400);
-
-    const body = await response.json();
+    const body = await expectJsonResponse(response, 400);
 
     expect(body.error).toBeDefined();
+    expect(typeof body.error).toBe('string');
   });
 
   test('POST /login with empty payload returns 400 and error message', async ({ apiClient }) => {
     const response = await apiClient.post('login', {});
-
-    expect(response.status()).toBe(400);
-
-    const body = await response.json();
+    const body = await expectJsonResponse(response, 400);
 
     expect(body.error).toBeDefined();
+    expect(typeof body.error).toBe('string');
   });
 
   test('POST /register without password returns 400 and error message', async ({ apiClient }) => {
     const response = await apiClient.post('register', {
       email: 'eve.holt@reqres.in',
     });
-
-    expect(response.status()).toBe(400);
-
-    const body = await response.json();
+    const body = await expectJsonResponse(response, 400);
 
     expect(body.error).toBeDefined();
+    expect(typeof body.error).toBe('string');
   });
 
   test('POST /register with empty payload returns 400 and error message', async ({ apiClient }) => {
     const response = await apiClient.post('register', {});
-
-    expect(response.status()).toBe(400);
-
-    const body = await response.json();
+    const body = await expectJsonResponse(response, 400);
 
     expect(body.error).toBeDefined();
+    expect(typeof body.error).toBe('string');
   });
 
   test('GET /app-users/login returns 405 method not allowed', async ({ apiClient }) => {
     const response = await apiClient.get('app-users/login');
-
-    expect(response.status()).toBe(405);
-
-    const body = await response.json();
+    const body = await expectJsonResponse(response, 405);
 
     expect(body.error).toBeDefined();
+    expect(typeof body.error).toBe('string');
   });
 });

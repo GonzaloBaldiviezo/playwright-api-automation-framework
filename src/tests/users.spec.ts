@@ -1,12 +1,10 @@
 import { test, expect } from '../fixtures/api.fixture';
+import { expectJsonResponse } from '../utils/api-assertions';
 
-test.describe('Users API - Positive', () => {
-  test('GET /users returns paginated list with status 200', async ({ apiClient }) => {
+test.describe('Users API - Positive @positive', () => {
+  test('@smoke GET /users returns paginated list with status 200', async ({ apiClient }) => {
     const response = await apiClient.get('users');
-
-    expect(response.status()).toBe(200);
-
-    const body = await response.json();
+    const body = await expectJsonResponse(response, 200);
 
     expect(body.page).toBeDefined();
     expect(Array.isArray(body.data)).toBe(true);
@@ -15,10 +13,7 @@ test.describe('Users API - Positive', () => {
 
   test('GET /users?page=2 returns page 2 with correct pagination', async ({ apiClient }) => {
     const response = await apiClient.get('users?page=2');
-
-    expect(response.status()).toBe(200);
-
-    const body = await response.json();
+    const body = await expectJsonResponse(response, 200);
 
     expect(body.page).toBe(2);
     expect(Array.isArray(body.data)).toBe(true);
@@ -26,10 +21,7 @@ test.describe('Users API - Positive', () => {
 
   test('GET /users/:id (id=1) returns single user with status 200', async ({ apiClient }) => {
     const response = await apiClient.get('users/1');
-
-    expect(response.status()).toBe(200);
-
-    const body = await response.json();
+    const body = await expectJsonResponse(response, 200);
 
     expect(body.data.id).toBe(1);
     expect(body.data.email).toBeDefined();
@@ -38,23 +30,17 @@ test.describe('Users API - Positive', () => {
 
 });
 
-test.describe('Users API - Negative', () => {
+test.describe('Users API - Negative @negative', () => {
   test('GET /users/:id (id=999) returns 404', async ({ apiClient }) => {
     const response = await apiClient.get('users/999');
-
-    expect(response.status()).toBe(404);
-
-    const body = await response.json();
+    const body = await expectJsonResponse(response, 404);
 
     expect(body).toBeDefined();
   });
 
   test('GET /users with malformed per_page query returns 200 (runtime behavior)', async ({ apiClient }) => {
     const response = await apiClient.get('users?per_page=101');
-
-    expect(response.status()).toBe(200);
-
-    const body = await response.json();
+    const body = await expectJsonResponse(response, 200);
 
     expect(body.per_page).toBe(101);
     expect(Array.isArray(body.data)).toBe(true);
