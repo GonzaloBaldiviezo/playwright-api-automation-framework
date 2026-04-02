@@ -4,6 +4,8 @@
   "description": "API test automation framework built with Playwright and TypeScript for portfolio-ready backend testing.",
   "scripts": {
     "test": "playwright test",
+    "test:ci": "playwright test --grep-invert @failing-demo",
+    "test:failing-demo": "playwright test --grep @failing-demo",
     "test:smoke": "playwright test --grep @smoke",
     "test:positive": "playwright test --grep @positive",
     "test:negative": "playwright test --grep @negative",
