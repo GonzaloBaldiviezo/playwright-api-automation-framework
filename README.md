@@ -1,5 +1,10 @@
 # 🎯 Playwright API Automation Framework
 
+[![Playwright Tests](https://github.com/GonzaloBaldiviezo/playwright-api-automation-framework/actions/workflows/playwright.yml/badge.svg?branch=main)](https://github.com/GonzaloBaldiviezo/playwright-api-automation-framework/actions/workflows/playwright.yml)
+[![Playwright](https://img.shields.io/badge/Playwright-API%20testing-2EAD33)](https://playwright.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6)](https://www.typescriptlang.org/)
+[![Failing Demo](https://img.shields.io/badge/failing--demo-intentional-orange)](#test-strategy)
+
 A clean, production-ready API test automation framework built with **Playwright** and **TypeScript**.
 
 This repository demonstrates solid engineering practices: reusable abstractions, fail-fast validation, structured test layers, and a scalable foundation ready to grow from smoke tests to comprehensive API coverage.
@@ -35,6 +40,14 @@ The foundation is here; the framework is structured to grow from an initial smok
 - Tests are tagged with `@smoke`, `@positive`, `@negative`, and `@failing-demo` so the suite can be filtered without changing files.
 - Assertions stay mostly inline in specs, with a single shared response helper to keep the suite simple and explicit.
 - The `@failing-demo` tests are intentionally wrong by design and exist only to generate a report with visible failures for demos.
+
+## Testing decisions
+
+- **Positive and negative separation** — Success and error cases live in different `describe` blocks so the HTML report is easier to scan and the suite intent is obvious.
+- **Tag-driven execution** — `@smoke`, `@positive`, `@negative`, and `@failing-demo` make it possible to run targeted subsets without changing code or file layout.
+- **Minimal helper approach** — The suite keeps assertions mostly inline and shares only `expectJsonResponse`, so the tests stay explicit and avoid premature abstraction.
+- **Intentional demo failures** — `@failing-demo` exists to showcase how Playwright reports failed checks. Those tests are part of local/demo execution, but intentionally excluded from CI.
+- **Runtime over paper contract** — When ReqRes runtime behavior differs from OpenAPI, the suite documents that gap and prioritizes stable executable checks over theoretical responses.
 
 ## Project structure
 
