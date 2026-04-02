@@ -25,14 +25,16 @@ This repository demonstrates solid engineering practices: reusable abstractions,
 - **smoke** — Core happy paths. Does the API respond to key requests? The essentials.
 - **positive** — Valid requests and expected success flows.
 - **negative** — Edge cases and errors. Invalid input → 400. Missing resource → 404. Framework handles them.
+- **failing-demo** — Intentionally failing cases used to demonstrate Playwright HTML reports and failure diagnostics.
 
 The foundation is here; the framework is structured to grow from an initial smoke suite into full coverage.
 
 ## Test organization
 
 - Positive and negative scenarios are separated into different `describe` blocks in each spec.
-- Tests are tagged with `@smoke`, `@positive`, and `@negative` so the suite can be filtered without changing files.
+- Tests are tagged with `@smoke`, `@positive`, `@negative`, and `@failing-demo` so the suite can be filtered without changing files.
 - Assertions stay mostly inline in specs, with a single shared response helper to keep the suite simple and explicit.
+- The `@failing-demo` tests are intentionally wrong by design and exist only to generate a report with visible failures for demos.
 
 ## Project structure
 
@@ -49,6 +51,7 @@ src/
     resources.spec.ts ← Resources coverage grouped by positive/negative
     auth.spec.ts      ← Auth coverage grouped by positive/negative
     crud.spec.ts      ← Write operations grouped by positive/negative
+    failing-demo.spec.ts ← Intentional failing tests for report demos
 docs/
   reqres-coverage-matrix.md ← OpenAPI/runtime coverage tracking
 
@@ -78,6 +81,8 @@ Or copy from `.env.example`.
 
 ```bash
 npm test
+npm run test:ci
+npm run test:failing-demo
 npm run test:smoke
 npm run test:positive
 npm run test:negative
@@ -109,18 +114,22 @@ Reqres is a hosted REST API for testing — perfect for portfolio work.
 
 **Run tests:**
 ```bash
-npm test  # Runs against Reqres live endpoints
+npm test  # Runs the full suite, including intentional failing-demo tests
+npm run test:ci  # Stable suite used by CI, excludes @failing-demo
+npm run test:failing-demo  # Runs only the intentional failing demo tests
 npm run test:smoke  # Core health-check flow
 npm run test:positive  # Successful scenarios only
 npm run test:negative  # Error and edge-case scenarios only
 npm run report  # View results in HTML
 ```
 
+If you generate an HTML report from `npm test`, expect to see intentional failures from the `@failing-demo` tag. That behavior is deliberate for demo purposes.
+
 This setup demonstrates real-world auth patterns: the framework always sends credentials (as shown in [src/api/client.ts](src/api/client.ts)), keeping authentication concerns centralized and separated from test logic.
 
 ## CI/CD
 
-GitHub Actions runs the Playwright suite on every push (all branches), on pull requests to `main` and `master`, and manually via workflow dispatch using [.github/workflows/playwright.yml](.github/workflows/playwright.yml). The workflow installs dependencies with `npm ci`, runs the suite, and uploads the Playwright HTML report as an artifact.
+GitHub Actions runs the Playwright suite on every push (all branches), on pull requests to `main` and `master`, and manually via workflow dispatch using [.github/workflows/playwright.yml](.github/workflows/playwright.yml). The workflow installs dependencies with `npm ci`, runs `npm run test:ci`, and uploads the Playwright HTML report as an artifact. That means CI excludes all tests tagged `@failing-demo`.
 
 ## Implementation highlights
 
@@ -133,6 +142,7 @@ GitHub Actions runs the Playwright suite on every push (all branches), on pull r
 ## Troubleshooting
 
 - **Tests fail immediately?** → Check `BASE_URL` and `API_KEY` in `.env`. Framework validates these at startup.
+- **`npm test` fails but CI passes?** → Check whether the failures come from `@failing-demo`. Those tests are intentionally wrong and are excluded from CI.
 - **404 on valid endpoint?** → Keep `BASE_URL` as the API root (e.g., `https://reqres.in/api`). The framework normalizes trailing slashes automatically.
 - **External API flaky?** → Retry with `curl` to confirm if it's the framework or the service.
 
