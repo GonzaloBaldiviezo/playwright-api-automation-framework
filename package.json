@@ -6,6 +6,7 @@
     "test": "playwright test",
     "test:ci": "playwright test --grep-invert @failing-demo",
     "test:failing-demo": "playwright test --grep @failing-demo",
+    "test:integration": "playwright test --grep @integration",
     "test:smoke": "playwright test --grep @smoke",
     "test:positive": "playwright test --grep @positive",
     "test:negative": "playwright test --grep @negative",
